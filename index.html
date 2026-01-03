@@ -3,113 +3,138 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Birthday Card Surprise</title>
-  <meta name="description" content="Click the envelope to reveal a birthday card message with confetti and sound." />
+  <title>Make a Wish 🎂</title>
+  <meta name="description" content="Make a wish countdown, blow out candles, sparkle burst, then open an envelope for a birthday card." />
   <link rel="preload" href="assets/bg.png" as="image">
   <link rel="preload" href="assets/pop.mp3" as="audio">
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <canvas id="confetti" aria-hidden="true"></canvas>
+  <!-- One canvas for confetti + sparkle bursts -->
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <!-- Always-on glitter overlay -->
   <div class="sparkles" aria-hidden="true"></div>
 
   <main class="stage">
     <header class="top">
-      <div class="pill" id="hint">Tap / Click the envelope ✨</div>
+      <div class="pill" id="hint">Watch the candles… then make a wish ✨</div>
     </header>
 
-    <section class="scene" aria-label="Birthday surprise scene">
-      <!-- Cake -->
-      <div class="cake-wrap" aria-hidden="true">
-        <svg class="cake" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="frost" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="rgba(255,255,255,.98)"/>
-              <stop offset="1" stop-color="rgba(255,255,255,.78)"/>
-            </linearGradient>
+    <section class="scene" aria-label="Birthday wish scene">
+      <!-- CAKE + WISH INTRO -->
+      <section class="intro" id="intro" aria-label="Make a wish countdown">
+        <div class="wish-title">MAKE A WISH</div>
 
-            <linearGradient id="tierPink" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="rgba(255,155,190,.98)"/>
-              <stop offset="1" stop-color="rgba(255,95,155,.96)"/>
-            </linearGradient>
+        <div class="countdown" aria-label="Countdown timer">
+          <span class="count-num" id="countNum">5</span>
+          <span class="count-s">s</span>
+        </div>
 
-            <linearGradient id="tierBlue" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="rgba(160,230,255,.98)"/>
-              <stop offset="1" stop-color="rgba(90,190,255,.95)"/>
-            </linearGradient>
+        <div class="cake-wrap" aria-hidden="true">
+          <!-- Cake SVG (big & vivid) -->
+          <svg class="cake" viewBox="0 0 560 460" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tierPink" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="rgba(255,160,200,.98)"/>
+                <stop offset="1" stop-color="rgba(255,95,160,.96)"/>
+              </linearGradient>
+              <linearGradient id="tierBlue" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="rgba(170,235,255,.98)"/>
+                <stop offset="1" stop-color="rgba(95,200,255,.95)"/>
+              </linearGradient>
+              <linearGradient id="tierLav" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="rgba(245,210,255,.98)"/>
+                <stop offset="1" stop-color="rgba(215,155,255,.96)"/>
+              </linearGradient>
+              <linearGradient id="frost" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="rgba(255,255,255,.98)"/>
+                <stop offset="1" stop-color="rgba(255,255,255,.78)"/>
+              </linearGradient>
+              <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="rgba(0,0,0,.20)"/>
+              </filter>
+              <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="2.2" result="b"/>
+                <feMerge>
+                  <feMergeNode in="b"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
 
-            <linearGradient id="tierLav" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="rgba(240,200,255,.98)"/>
-              <stop offset="1" stop-color="rgba(210,150,255,.96)"/>
-            </linearGradient>
+            <!-- plate -->
+            <ellipse cx="280" cy="410" rx="240" ry="38" fill="rgba(255,255,255,.65)" filter="url(#softShadow)"/>
 
-            <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,.18)"/>
-            </filter>
+            <!-- bottom tier -->
+            <g filter="url(#softShadow)">
+              <rect x="85" y="245" width="390" height="150" rx="38" fill="url(#tierPink)"/>
+              <path d="M110 265 C150 310 190 210 230 265 C270 310 310 210 350 265 C390 310 430 210 470 265"
+                    fill="none" stroke="url(#frost)" stroke-width="28" stroke-linecap="round" opacity=".97"/>
+              <g opacity=".9">
+                <circle cx="145" cy="330" r="7" fill="rgba(255,255,255,.96)"/>
+                <circle cx="210" cy="350" r="6" fill="rgba(255,255,255,.96)"/>
+                <circle cx="280" cy="332" r="7" fill="rgba(255,255,255,.96)"/>
+                <circle cx="350" cy="352" r="6" fill="rgba(255,255,255,.96)"/>
+                <circle cx="420" cy="330" r="7" fill="rgba(255,255,255,.96)"/>
+              </g>
+            </g>
 
-            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2" result="b"/>
-              <feMerge>
-                <feMergeNode in="b"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
+            <!-- middle tier -->
+            <g filter="url(#softShadow)">
+              <rect x="140" y="150" width="280" height="110" rx="32" fill="url(#tierBlue)"/>
+              <path d="M170 175 C205 215 240 125 275 175 C310 215 345 125 380 175 C415 215 450 125 485 175"
+                    transform="translate(-70,0)"
+                    fill="none" stroke="rgba(255,255,255,.96)" stroke-width="22" stroke-linecap="round" opacity=".96"/>
+            </g>
 
-          <ellipse cx="260" cy="370" rx="220" ry="36" fill="rgba(255,255,255,.62)" filter="url(#softShadow)"/>
+            <!-- top tier -->
+            <g filter="url(#softShadow)">
+              <rect x="190" y="75" width="180" height="95" rx="30" fill="url(#tierLav)"/>
+              <path d="M220 105 C250 130 280 60 310 105 C340 130 370 60 400 105"
+                    transform="translate(-20,0)"
+                    fill="none" stroke="rgba(255,255,255,.96)" stroke-width="18" stroke-linecap="round" opacity=".96"/>
+            </g>
 
-          <g filter="url(#softShadow)">
-            <rect x="85" y="210" width="350" height="140" rx="34" fill="url(#tierPink)"/>
-            <path d="M120 228 C155 270 190 185 225 228 C260 270 295 185 330 228 C365 270 400 185 435 228"
-                  transform="translate(-22,0)"
-                  fill="none" stroke="url(#frost)" stroke-width="26" stroke-linecap="round" opacity=".96"/>
-            <circle cx="145" cy="296" r="7" fill="rgba(255,255,255,.96)"/>
-            <circle cx="205" cy="314" r="6" fill="rgba(255,255,255,.96)"/>
-            <circle cx="270" cy="297" r="7" fill="rgba(255,255,255,.96)"/>
-            <circle cx="332" cy="315" r="6" fill="rgba(255,255,255,.96)"/>
-            <circle cx="395" cy="296" r="7" fill="rgba(255,255,255,.96)"/>
-          </g>
+            <!-- candle bodies -->
+            <g filter="url(#glow)">
+              <rect x="245" y="28" width="14" height="70" rx="7" fill="rgba(255,255,255,.95)"/>
+              <rect x="273" y="18" width="14" height="80" rx="7" fill="rgba(255,255,255,.95)"/>
+              <rect x="301" y="28" width="14" height="70" rx="7" fill="rgba(255,255,255,.95)"/>
+            </g>
+          </svg>
 
-          <g filter="url(#softShadow)">
-            <rect x="130" y="126" width="260" height="104" rx="28" fill="url(#tierBlue)"/>
-            <path d="M165 150 C195 185 225 120 255 150 C285 185 315 120 345 150 C375 185 405 120 435 150"
-                  transform="translate(-55,0)"
-                  fill="none" stroke="rgba(255,255,255,.96)" stroke-width="20" stroke-linecap="round" opacity=".96"/>
-          </g>
+          <!-- Flames (animated) -->
+          <div class="flames" aria-hidden="true">
+            <div class="flame f1"></div>
+            <div class="flame f2"></div>
+            <div class="flame f3"></div>
+          </div>
 
-          <g filter="url(#softShadow)">
-            <rect x="172" y="62" width="176" height="84" rx="26" fill="url(#tierLav)"/>
-            <path d="M205 90 C230 112 255 64 280 90 C305 112 330 64 355 90"
-                  transform="translate(-18,0)"
-                  fill="none" stroke="rgba(255,255,255,.96)" stroke-width="18" stroke-linecap="round" opacity=".96"/>
-          </g>
+          <!-- Smoke (after blow) -->
+          <div class="smoke" aria-hidden="true">
+            <span class="p p1"></span>
+            <span class="p p2"></span>
+            <span class="p p3"></span>
+          </div>
+        </div>
+      </section>
 
-          <g filter="url(#glow)">
-            <rect x="228" y="22" width="12" height="60" rx="6" fill="rgba(255,255,255,.95)"/>
-            <rect x="254" y="14" width="12" height="68" rx="6" fill="rgba(255,255,255,.95)"/>
-            <rect x="280" y="22" width="12" height="60" rx="6" fill="rgba(255,255,255,.95)"/>
-            <path d="M234 20 C228 10 242 10 236 20" fill="rgba(255,200,90,.98)"/>
-            <path d="M260 12 C254 2 268 2 262 12" fill="rgba(255,200,90,.98)"/>
-            <path d="M286 20 C280 10 294 10 288 20" fill="rgba(255,200,90,.98)"/>
-          </g>
-        </svg>
-      </div>
-
-      <!-- Envelope (will disappear after click) -->
-      <div class="envelope-wrap" id="envelopeWrap">
-        <button class="envelope" id="envelope" type="button" aria-label="Open the birthday card">
+      <!-- ENVELOPE (appears after countdown) -->
+      <div class="envelope-wrap" id="envelopeWrap" aria-hidden="true">
+        <button class="envelope" id="envelope" type="button" aria-label="Open the envelope">
           <div class="env-shadow"></div>
-
           <div class="env-body">
             <div class="env-back"></div>
             <div class="env-front"></div>
             <div class="env-flap"></div>
           </div>
+          <div class="env-label">Tap to open 💌</div>
         </button>
       </div>
 
-      <!-- Card (shows after click) -->
+      <!-- CARD (appears after envelope click, envelope disappears fully) -->
       <div class="card-wrap" id="cardWrap" aria-hidden="true">
         <div class="card" role="dialog" aria-label="Birthday message card">
           <div class="card-bg-decor" aria-hidden="true"></div>
@@ -118,7 +143,7 @@
             <div class="header-badge">🎉</div>
             <div class="header-text">
               <div class="header-title">Happy Birthday!</div>
-              <div class="header-sub">A little surprise just for you</div>
+              <div class="header-sub">Wishing you a beautiful year ahead</div>
             </div>
           </div>
 
@@ -147,7 +172,7 @@
     </section>
 
     <footer class="bottom">
-      <div class="small">Made for instant digital gifting • Works on mobile & desktop</div>
+      <div class="small">Instant digital surprise • Works on mobile & desktop</div>
     </footer>
   </main>
 
