@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Card Surprise</title>
+  <meta name="description" content="Click the envelope to reveal a birthday card message with confetti and sound." />
+  <link rel="preload" href="assets/bg.png" as="image">
+  <link rel="preload" href="assets/pop.mp3" as="audio">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div class="sparkles" aria-hidden="true"></div>
+
+  <main class="stage" role="main">
+    <header class="top">
+      <div class="pill" id="hint">Tap / Click the envelope ✨</div>
+    </header>
+
+    <section class="scene" aria-label="Birthday surprise scene">
+      <!-- Cake (SVG) -->
+      <div class="cake-wrap" aria-hidden="true">
+        <svg class="cake" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="frost" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stop-color="rgba(255,255,255,.95)"/>
+              <stop offset="1" stop-color="rgba(255,255,255,.75)"/>
+            </linearGradient>
+            <linearGradient id="tier" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stop-color="rgba(255,205,220,.95)"/>
+              <stop offset="1" stop-color="rgba(255,170,190,.9)"/>
+            </linearGradient>
+            <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,.18)"/>
+            </filter>
+            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="2" result="b"/>
+              <feMerge>
+                <feMergeNode in="b"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <ellipse cx="260" cy="370" rx="200" ry="32" fill="rgba(255,255,255,.55)" filter="url(#softShadow)"/>
+
+          <g filter="url(#softShadow)">
+            <rect x="110" y="220" width="300" height="120" rx="28" fill="url(#tier)"/>
+            <path d="M130 230 C160 270 190 190 220 230 C250 270 280 190 310 230 C340 270 370 190 390 230"
+                  fill="none" stroke="url(#frost)" stroke-width="22" stroke-linecap="round" opacity=".95"/>
+            <circle cx="150" cy="285" r="7" fill="rgba(255,255,255,.95)"/>
+            <circle cx="200" cy="300" r="6" fill="rgba(255,255,255,.95)"/>
+            <circle cx="250" cy="288" r="7" fill="rgba(255,255,255,.95)"/>
+            <circle cx="305" cy="302" r="6" fill="rgba(255,255,255,.95)"/>
+            <circle cx="360" cy="287" r="7" fill="rgba(255,255,255,.95)"/>
+          </g>
+
+          <g filter="url(#softShadow)">
+            <rect x="150" y="140" width="220" height="90" rx="24" fill="rgba(210,240,255,.95)"/>
+            <path d="M170 152 C195 182 220 125 245 152 C270 182 295 125 320 152 C345 182 370 125 395 152"
+                  transform="translate(-25,0)"
+                  fill="none" stroke="rgba(255,255,255,.95)" stroke-width="18" stroke-linecap="round" opacity=".95"/>
+          </g>
+
+          <g filter="url(#softShadow)">
+            <rect x="185" y="75" width="150" height="70" rx="22" fill="rgba(245,225,255,.95)"/>
+            <path d="M205 90 C225 110 245 70 265 90 C285 110 305 70 325 90"
+                  fill="none" stroke="rgba(255,255,255,.95)" stroke-width="16" stroke-linecap="round" opacity=".95"/>
+          </g>
+
+          <g filter="url(#glow)">
+            <rect x="235" y="35" width="12" height="48" rx="6" fill="rgba(255,255,255,.9)"/>
+            <rect x="255" y="28" width="12" height="55" rx="6" fill="rgba(255,255,255,.9)"/>
+            <rect x="275" y="35" width="12" height="48" rx="6" fill="rgba(255,255,255,.9)"/>
+            <path d="M241 28 C235 18 249 18 243 28" fill="rgba(255,200,90,.95)"/>
+            <path d="M261 20 C255 10 269 10 263 20" fill="rgba(255,200,90,.95)"/>
+            <path d="M281 28 C275 18 289 18 283 28" fill="rgba(255,200,90,.95)"/>
+          </g>
+
+          <g opacity=".85">
+            <rect x="185" y="255" width="16" height="4" rx="2" fill="rgba(255,255,255,.9)" transform="rotate(-10 185 255)"/>
+            <rect x="245" y="265" width="16" height="4" rx="2" fill="rgba(255,255,255,.9)" transform="rotate(12 245 265)"/>
+            <rect x="315" y="260" width="16" height="4" rx="2" fill="rgba(255,255,255,.9)" transform="rotate(-14 315 260)"/>
+            <circle cx="170" cy="200" r="5" fill="rgba(255,255,255,.9)"/>
+            <circle cx="340" cy="195" r="5" fill="rgba(255,255,255,.9)"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Envelope -->
+      <button class="envelope" id="envelope" type="button" aria-label="Open the birthday card">
+        <div class="env-shadow"></div>
+
+        <div class="env-body">
+          <div class="env-back"></div>
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+
+          <div class="letter" id="letter" aria-hidden="true">
+            <div class="card" role="dialog" aria-label="Birthday message">
+              <div class="card-top">
+                <div class="badge">🎉</div>
+                <div class="title">Happy Birthday!</div>
+              </div>
+
+              <div class="message" id="msg">
+                Wishing you a day full of smiles, surprises, and sweet moments. 💛
+              </div>
+
+              <div class="from" id="from">— Someone who cares</div>
+
+              <div class="footer-note" id="footerNote">
+                (Tip: you can set a custom message using <code>?msg=</code> in the link.)
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <audio id="pop" src="assets/pop.mp3" preload="auto"></audio>
+    </section>
+
+    <footer class="bottom">
+      <div class="small">Made for instant digital gifting • Works on mobile & desktop</div>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
