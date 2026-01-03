@@ -1,6 +1,7 @@
-// Birthday Surprise Script (no external libraries)
 (() => {
-  const envelope = document.getElementById("envelope");
+  const envelopeWrap = document.getElementById("envelopeWrap");
+  const envelopeBtn = document.getElementById("envelope");
+  const cardWrap = document.getElementById("cardWrap");
   const canvas = document.getElementById("confetti");
   const ctx = canvas.getContext("2d");
   const pop = document.getElementById("pop");
@@ -8,23 +9,22 @@
   const fromEl = document.getElementById("from");
   const hint = document.getElementById("hint");
 
-  // ===== URL personalization =====
-  // Example:
-  // ?msg=Happy%20Birthday!%20...&from=Esra&title=Birthday%20Surprise
+  // URL personalization:
+  // ?msg=...&from=...&title=...
   const params = new URLSearchParams(location.search);
   const msg = params.get("msg");
   const from = params.get("from");
   const title = params.get("title");
 
-  if (title) document.title = safeText(title);
-  if (msg) msgEl.textContent = safeText(msg);
-  if (from) fromEl.textContent = "— " + safeText(from);
-
   function safeText(s) {
     return String(s).replace(/[\u0000-\u001F\u007F]/g, "").trim();
   }
 
-  // ===== Confetti Engine =====
+  if (title) document.title = safeText(title);
+  if (msg) msgEl.textContent = safeText(msg);
+  if (from) fromEl.textContent = "— " + safeText(from);
+
+  // ===== Confetti engine =====
   let W = 0, H = 0;
   const particles = [];
   let raf = 0;
@@ -46,7 +46,7 @@
   function pick(arr) { return arr[(Math.random() * arr.length) | 0]; }
 
   function addBurst(side) {
-    const count = Math.floor(rand(90, 140));
+    const count = Math.floor(rand(110, 170));
     const x = side === "left" ? -10 : W + 10;
     const dir = side === "left" ? 1 : -1;
 
@@ -54,14 +54,14 @@
       particles.push({
         x,
         y: rand(H * 0.25, H * 0.75),
-        vx: rand(4.8, 12) * dir,
-        vy: rand(-9, 6),
+        vx: rand(5.2, 13.2) * dir,
+        vy: rand(-9.5, 6.5),
         g: rand(0.18, 0.34),
         rot: rand(0, Math.PI * 2),
         vr: rand(-0.18, 0.18),
         size: rand(4, 10),
         life: 0,
-        max: rand(70, 130),
+        max: rand(75, 135),
         shape: Math.random() < 0.7 ? "rect" : "circle",
         color: pick([
           "#ff4d6d", "#ffd166", "#06d6a0", "#118ab2",
@@ -85,7 +85,7 @@
       p.rot += p.vr;
 
       const alpha = 1 - (p.life / p.max);
-      if (alpha <= 0 || p.y > H + 80 || p.x < -120 || p.x > W + 120) {
+      if (alpha <= 0 || p.y > H + 80 || p.x < -140 || p.x > W + 140) {
         particles.splice(i, 1);
         continue;
       }
@@ -118,27 +118,52 @@
     if (!raf) tick();
   }
 
-  // ===== Click / Tap behavior =====
-  let opened = false;
-
-  envelope.addEventListener("click", async () => {
-    opened = !opened;
-    envelope.classList.toggle("open", opened);
-
-    // play sound only on user gesture
+  async function playPop() {
     try {
       pop.currentTime = 0;
       await pop.play();
     } catch (e) {}
+  }
 
+  // ===== Open flow (envelope disappears, card stays) =====
+  let opened = false;
+
+  envelopeBtn.addEventListener("click", async () => {
+    if (!opened) {
+      opened = true;
+
+      hint.textContent = "Click the card to replay ✨";
+      cardWrap.classList.add("show");
+      cardWrap.setAttribute("aria-hidden", "false");
+
+      envelopeWrap.classList.add("vanish");
+
+      await playPop();
+      blastConfetti();
+
+      // IMPORTANT: remove envelope completely so it never covers the card
+      setTimeout(() => {
+        envelopeWrap.style.display = "none";
+      }, 560);
+    } else {
+      // if somehow clicked again
+      await playPop();
+      blastConfetti();
+    }
+  }, { passive: true });
+
+  // Replay on card click (optional)
+  cardWrap.addEventListener("click", async () => {
+    if (!opened) return;
+    await playPop();
     blastConfetti();
-    hint.textContent = opened ? "Click again to close ✨" : "Tap / Click the envelope ✨";
   }, { passive: true });
 
   // Optional auto-open (sound still needs click)
   if (params.get("open") === "1") {
-    envelope.classList.add("open");
-    hint.textContent = "Click to replay confetti + sound ✨";
     opened = true;
+    hint.textContent = "Click the card to play sound + confetti ✨";
+    cardWrap.classList.add("show");
+    envelopeWrap.style.display = "none";
   }
 })();
