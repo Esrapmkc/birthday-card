@@ -1,16 +1,19 @@
 (() => {
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d");
+
+  const intro = document.getElementById("intro");
+  const countNum = document.getElementById("countNum");
   const envelopeWrap = document.getElementById("envelopeWrap");
   const envelopeBtn = document.getElementById("envelope");
   const cardWrap = document.getElementById("cardWrap");
-  const canvas = document.getElementById("confetti");
-  const ctx = canvas.getContext("2d");
+
   const pop = document.getElementById("pop");
   const msgEl = document.getElementById("msg");
   const fromEl = document.getElementById("from");
   const hint = document.getElementById("hint");
 
-  // URL personalization:
-  // ?msg=...&from=...&title=...
+  // URL personalization: ?msg=...&from=...&title=...
   const params = new URLSearchParams(location.search);
   const msg = params.get("msg");
   const from = params.get("from");
@@ -19,16 +22,12 @@
   function safeText(s) {
     return String(s).replace(/[\u0000-\u001F\u007F]/g, "").trim();
   }
-
   if (title) document.title = safeText(title);
   if (msg) msgEl.textContent = safeText(msg);
   if (from) fromEl.textContent = "— " + safeText(from);
 
-  // ===== Confetti engine =====
+  // ===== Canvas resize =====
   let W = 0, H = 0;
-  const particles = [];
-  let raf = 0;
-
   function resize() {
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     W = Math.floor(window.innerWidth);
@@ -42,16 +41,20 @@
   window.addEventListener("resize", resize, { passive: true });
   resize();
 
+  // ===== FX Engine: confetti + sparkles =====
+  const particles = [];
+  let raf = 0;
+
   function rand(min, max) { return Math.random() * (max - min) + min; }
   function pick(arr) { return arr[(Math.random() * arr.length) | 0]; }
 
-  function addBurst(side) {
-    const count = Math.floor(rand(110, 170));
+  function addConfettiBurst(side) {
+    const count = Math.floor(rand(120, 180));
     const x = side === "left" ? -10 : W + 10;
     const dir = side === "left" ? 1 : -1;
-
     for (let i = 0; i < count; i++) {
       particles.push({
+        kind: "confetti",
         x,
         y: rand(H * 0.25, H * 0.75),
         vx: rand(5.2, 13.2) * dir,
@@ -63,10 +66,29 @@
         life: 0,
         max: rand(75, 135),
         shape: Math.random() < 0.7 ? "rect" : "circle",
-        color: pick([
-          "#ff4d6d", "#ffd166", "#06d6a0", "#118ab2",
-          "#9b5de5", "#f15bb5", "#00bbf9", "#fee440"
-        ])
+        color: pick(["#ff4d6d","#ffd166","#06d6a0","#118ab2","#9b5de5","#f15bb5","#00bbf9","#fee440"])
+      });
+    }
+  }
+
+  function addSparkleBurst(cx, cy) {
+    const count = Math.floor(rand(90, 140));
+    for (let i = 0; i < count; i++) {
+      const a = rand(0, Math.PI * 2);
+      const sp = rand(2.2, 7.2);
+      particles.push({
+        kind: "sparkle",
+        x: cx,
+        y: cy,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp - rand(1.5, 3.0),
+        g: rand(0.05, 0.10),
+        rot: rand(0, Math.PI * 2),
+        vr: rand(-0.25, 0.25),
+        size: rand(2, 5),
+        life: 0,
+        max: rand(45, 80),
+        color: pick(["rgba(255,255,255,.95)","rgba(255,240,200,.95)","rgba(255,220,160,.95)"])
       });
     }
   }
@@ -85,24 +107,40 @@
       p.rot += p.vr;
 
       const alpha = 1 - (p.life / p.max);
-      if (alpha <= 0 || p.y > H + 80 || p.x < -140 || p.x > W + 140) {
+      if (alpha <= 0 || p.y > H + 120 || p.x < -160 || p.x > W + 160) {
         particles.splice(i, 1);
         continue;
       }
 
       ctx.save();
       ctx.globalAlpha = Math.max(0, alpha);
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.fillStyle = p.color;
 
-      if (p.shape === "rect") {
-        ctx.fillRect(-p.size * 0.5, -p.size * 0.35, p.size, p.size * 0.7);
+      if (p.kind === "confetti") {
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if (p.shape === "rect") {
+          ctx.fillRect(-p.size * 0.5, -p.size * 0.35, p.size, p.size * 0.7);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
       } else {
+        // sparkle (tiny star-ish)
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        const s = p.size;
         ctx.beginPath();
-        ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2);
+        ctx.moveTo(0, -s);
+        ctx.lineTo(s * 0.55, 0);
+        ctx.lineTo(0, s);
+        ctx.lineTo(-s * 0.55, 0);
+        ctx.closePath();
         ctx.fill();
       }
+
       ctx.restore();
     }
 
@@ -112,9 +150,7 @@
     }
   }
 
-  function blastConfetti() {
-    addBurst("left");
-    addBurst("right");
+  function ensureTick() {
     if (!raf) tick();
   }
 
@@ -125,45 +161,95 @@
     } catch (e) {}
   }
 
-  // ===== Open flow (envelope disappears, card stays) =====
-  let opened = false;
+  // ===== FLOW =====
+  // 1) countdown 5 → 0 while flames flicker (CSS)
+  // 2) at 0: blow out (CSS class), sparkle burst, then show envelope
+  let seconds = 5;
+  let openedEnvelope = false;
+
+  function setHint(text) { hint.textContent = text; }
+
+  function startCountdown() {
+    countNum.textContent = String(seconds);
+
+    const timer = setInterval(() => {
+      seconds -= 1;
+      if (seconds < 0) {
+        clearInterval(timer);
+        return;
+      }
+      countNum.textContent = String(seconds);
+
+      if (seconds === 0) {
+        clearInterval(timer);
+        blowOut();
+      }
+    }, 1000);
+  }
+
+  function blowOut() {
+    // Flames off + smoke on
+    intro.classList.add("blown");
+    setHint("✨ Blow… and watch the sparkle magic!");
+
+    // sparkle burst near candle area (upper center)
+    addSparkleBurst(W * 0.5, H * 0.28);
+    addSparkleBurst(W * 0.5, H * 0.30);
+    ensureTick();
+
+    // After a moment, reveal envelope
+    setTimeout(() => {
+      envelopeWrap.classList.add("show");
+      envelopeWrap.setAttribute("aria-hidden", "false");
+      setHint("Tap the envelope 💌");
+    }, 900);
+  }
 
   envelopeBtn.addEventListener("click", async () => {
-    if (!opened) {
-      opened = true;
-
-      hint.textContent = "Click the card to replay ✨";
-      cardWrap.classList.add("show");
-      cardWrap.setAttribute("aria-hidden", "false");
-
-      envelopeWrap.classList.add("vanish");
-
+    if (openedEnvelope) {
+      // Replay confetti
       await playPop();
-      blastConfetti();
-
-      // IMPORTANT: remove envelope completely so it never covers the card
-      setTimeout(() => {
-        envelopeWrap.style.display = "none";
-      }, 560);
-    } else {
-      // if somehow clicked again
-      await playPop();
-      blastConfetti();
+      addConfettiBurst("left");
+      addConfettiBurst("right");
+      ensureTick();
+      return;
     }
-  }, { passive: true });
 
-  // Replay on card click (optional)
-  cardWrap.addEventListener("click", async () => {
-    if (!opened) return;
+    openedEnvelope = true;
+
+    // Confetti + sound
     await playPop();
-    blastConfetti();
+    addConfettiBurst("left");
+    addConfettiBurst("right");
+    ensureTick();
+
+    // Show card
+    cardWrap.classList.add("show");
+    cardWrap.setAttribute("aria-hidden", "false");
+    setHint("Tap the card to replay ✨");
+
+    // Envelope vanishes completely
+    envelopeWrap.classList.add("vanish");
+    setTimeout(() => {
+      envelopeWrap.style.display = "none";
+    }, 560);
   }, { passive: true });
 
-  // Optional auto-open (sound still needs click)
-  if (params.get("open") === "1") {
-    opened = true;
-    hint.textContent = "Click the card to play sound + confetti ✨";
-    cardWrap.classList.add("show");
-    envelopeWrap.style.display = "none";
+  // Replay on card click
+  cardWrap.addEventListener("click", async () => {
+    if (!openedEnvelope) return;
+    await playPop();
+    addConfettiBurst("left");
+    addConfettiBurst("right");
+    ensureTick();
+  }, { passive: true });
+
+  // Optional: skip countdown if ?skip=1
+  if (params.get("skip") === "1") {
+    seconds = 0;
+    countNum.textContent = "0";
+    blowOut();
+  } else {
+    startCountdown();
   }
 })();
