@@ -1,3 +1,4 @@
+// Birthday Surprise Script (no external libraries)
 (() => {
   const envelope = document.getElementById("envelope");
   const canvas = document.getElementById("confetti");
@@ -6,26 +7,24 @@
   const msgEl = document.getElementById("msg");
   const fromEl = document.getElementById("from");
   const hint = document.getElementById("hint");
-  const footerNote = document.getElementById("footerNote");
 
-  // URL params: ?msg=...&from=...&title=...
+  // ===== URL personalization =====
+  // Example:
+  // ?msg=Happy%20Birthday!%20...&from=Esra&title=Birthday%20Surprise
   const params = new URLSearchParams(location.search);
   const msg = params.get("msg");
   const from = params.get("from");
   const title = params.get("title");
 
-  if (title) document.title = title;
-  if (msg) {
-    msgEl.textContent = safeText(msg);
-    footerNote.style.display = "none";
-  }
+  if (title) document.title = safeText(title);
+  if (msg) msgEl.textContent = safeText(msg);
   if (from) fromEl.textContent = "— " + safeText(from);
 
   function safeText(s) {
     return String(s).replace(/[\u0000-\u001F\u007F]/g, "").trim();
   }
 
-  // Confetti
+  // ===== Confetti Engine =====
   let W = 0, H = 0;
   const particles = [];
   let raf = 0;
@@ -47,7 +46,7 @@
   function pick(arr) { return arr[(Math.random() * arr.length) | 0]; }
 
   function addBurst(side) {
-    const count = Math.floor(rand(80, 120));
+    const count = Math.floor(rand(90, 140));
     const x = side === "left" ? -10 : W + 10;
     const dir = side === "left" ? 1 : -1;
 
@@ -55,7 +54,7 @@
       particles.push({
         x,
         y: rand(H * 0.25, H * 0.75),
-        vx: rand(4.5, 11) * dir,
+        vx: rand(4.8, 12) * dir,
         vy: rand(-9, 6),
         g: rand(0.18, 0.34),
         rot: rand(0, Math.PI * 2),
@@ -64,7 +63,10 @@
         life: 0,
         max: rand(70, 130),
         shape: Math.random() < 0.7 ? "rect" : "circle",
-        color: pick(["#ff4d6d","#ffd166","#06d6a0","#118ab2","#9b5de5","#f15bb5","#00bbf9","#fee440"])
+        color: pick([
+          "#ff4d6d", "#ffd166", "#06d6a0", "#118ab2",
+          "#9b5de5", "#f15bb5", "#00bbf9", "#fee440"
+        ])
       });
     }
   }
@@ -76,6 +78,7 @@
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.life += 1;
+
       p.vy += p.g;
       p.x += p.vx;
       p.y += p.vy;
@@ -115,12 +118,14 @@
     if (!raf) tick();
   }
 
-  // Click behavior
+  // ===== Click / Tap behavior =====
   let opened = false;
+
   envelope.addEventListener("click", async () => {
     opened = !opened;
     envelope.classList.toggle("open", opened);
 
+    // play sound only on user gesture
     try {
       pop.currentTime = 0;
       await pop.play();
@@ -130,6 +135,7 @@
     hint.textContent = opened ? "Click again to close ✨" : "Tap / Click the envelope ✨";
   }, { passive: true });
 
+  // Optional auto-open (sound still needs click)
   if (params.get("open") === "1") {
     envelope.classList.add("open");
     hint.textContent = "Click to replay confetti + sound ✨";
