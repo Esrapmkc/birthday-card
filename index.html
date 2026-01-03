@@ -9,17 +9,18 @@
   <link rel="preload" href="assets/pop.mp3" as="audio">
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <canvas id="confetti" aria-hidden="true"></canvas>
   <div class="sparkles" aria-hidden="true"></div>
 
-  <main class="stage" role="main">
+  <main class="stage">
     <header class="top">
       <div class="pill" id="hint">Tap / Click the envelope ✨</div>
     </header>
 
     <section class="scene" aria-label="Birthday surprise scene">
-      <!-- Cake (SVG) -->
+      <!-- Cake -->
       <div class="cake-wrap" aria-hidden="true">
         <svg class="cake" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -56,95 +57,91 @@
             </filter>
           </defs>
 
-          <!-- plate -->
-          <ellipse cx="260" cy="370" rx="210" ry="34" fill="rgba(255,255,255,.62)" filter="url(#softShadow)"/>
+          <ellipse cx="260" cy="370" rx="220" ry="36" fill="rgba(255,255,255,.62)" filter="url(#softShadow)"/>
 
-          <!-- bottom tier -->
           <g filter="url(#softShadow)">
-            <rect x="95" y="215" width="330" height="130" rx="32" fill="url(#tierPink)"/>
+            <rect x="85" y="210" width="350" height="140" rx="34" fill="url(#tierPink)"/>
             <path d="M120 228 C155 270 190 185 225 228 C260 270 295 185 330 228 C365 270 400 185 435 228"
                   transform="translate(-22,0)"
-                  fill="none" stroke="url(#frost)" stroke-width="24" stroke-linecap="round" opacity=".96"/>
-            <!-- sprinkles -->
-            <circle cx="150" cy="292" r="7" fill="rgba(255,255,255,.96)"/>
-            <circle cx="205" cy="310" r="6" fill="rgba(255,255,255,.96)"/>
-            <circle cx="265" cy="294" r="7" fill="rgba(255,255,255,.96)"/>
-            <circle cx="325" cy="312" r="6" fill="rgba(255,255,255,.96)"/>
-            <circle cx="385" cy="292" r="7" fill="rgba(255,255,255,.96)"/>
+                  fill="none" stroke="url(#frost)" stroke-width="26" stroke-linecap="round" opacity=".96"/>
+            <circle cx="145" cy="296" r="7" fill="rgba(255,255,255,.96)"/>
+            <circle cx="205" cy="314" r="6" fill="rgba(255,255,255,.96)"/>
+            <circle cx="270" cy="297" r="7" fill="rgba(255,255,255,.96)"/>
+            <circle cx="332" cy="315" r="6" fill="rgba(255,255,255,.96)"/>
+            <circle cx="395" cy="296" r="7" fill="rgba(255,255,255,.96)"/>
           </g>
 
-          <!-- middle tier -->
           <g filter="url(#softShadow)">
-            <rect x="140" y="132" width="240" height="98" rx="26" fill="url(#tierBlue)"/>
+            <rect x="130" y="126" width="260" height="104" rx="28" fill="url(#tierBlue)"/>
             <path d="M165 150 C195 185 225 120 255 150 C285 185 315 120 345 150 C375 185 405 120 435 150"
                   transform="translate(-55,0)"
+                  fill="none" stroke="rgba(255,255,255,.96)" stroke-width="20" stroke-linecap="round" opacity=".96"/>
+          </g>
+
+          <g filter="url(#softShadow)">
+            <rect x="172" y="62" width="176" height="84" rx="26" fill="url(#tierLav)"/>
+            <path d="M205 90 C230 112 255 64 280 90 C305 112 330 64 355 90"
+                  transform="translate(-18,0)"
                   fill="none" stroke="rgba(255,255,255,.96)" stroke-width="18" stroke-linecap="round" opacity=".96"/>
           </g>
 
-          <!-- top tier -->
-          <g filter="url(#softShadow)">
-            <rect x="180" y="68" width="160" height="78" rx="24" fill="url(#tierLav)"/>
-            <path d="M205 90 C230 112 255 64 280 90 C305 112 330 64 355 90"
-                  transform="translate(-18,0)"
-                  fill="none" stroke="rgba(255,255,255,.96)" stroke-width="16" stroke-linecap="round" opacity=".96"/>
-          </g>
-
-          <!-- candles -->
           <g filter="url(#glow)">
-            <rect x="230" y="28" width="12" height="54" rx="6" fill="rgba(255,255,255,.95)"/>
-            <rect x="254" y="20" width="12" height="62" rx="6" fill="rgba(255,255,255,.95)"/>
-            <rect x="278" y="28" width="12" height="54" rx="6" fill="rgba(255,255,255,.95)"/>
-            <path d="M236 24 C230 14 244 14 238 24" fill="rgba(255,200,90,.98)"/>
-            <path d="M260 16 C254 6 268 6 262 16" fill="rgba(255,200,90,.98)"/>
-            <path d="M284 24 C278 14 292 14 286 24" fill="rgba(255,200,90,.98)"/>
-          </g>
-
-          <!-- extra mini decorations -->
-          <g opacity=".9">
-            <rect x="180" y="265" width="18" height="5" rx="2.5" fill="rgba(255,255,255,.92)" transform="rotate(-10 180 265)"/>
-            <rect x="250" y="275" width="18" height="5" rx="2.5" fill="rgba(255,255,255,.92)" transform="rotate(12 250 275)"/>
-            <rect x="325" y="270" width="18" height="5" rx="2.5" fill="rgba(255,255,255,.92)" transform="rotate(-14 325 270)"/>
-            <circle cx="165" cy="198" r="6" fill="rgba(255,255,255,.92)"/>
-            <circle cx="352" cy="194" r="6" fill="rgba(255,255,255,.92)"/>
+            <rect x="228" y="22" width="12" height="60" rx="6" fill="rgba(255,255,255,.95)"/>
+            <rect x="254" y="14" width="12" height="68" rx="6" fill="rgba(255,255,255,.95)"/>
+            <rect x="280" y="22" width="12" height="60" rx="6" fill="rgba(255,255,255,.95)"/>
+            <path d="M234 20 C228 10 242 10 236 20" fill="rgba(255,200,90,.98)"/>
+            <path d="M260 12 C254 2 268 2 262 12" fill="rgba(255,200,90,.98)"/>
+            <path d="M286 20 C280 10 294 10 288 20" fill="rgba(255,200,90,.98)"/>
           </g>
         </svg>
       </div>
 
-      <!-- Envelope / postcard -->
-      <button class="envelope" id="envelope" type="button" aria-label="Open the birthday card">
-        <div class="env-shadow"></div>
+      <!-- Envelope (will disappear after click) -->
+      <div class="envelope-wrap" id="envelopeWrap">
+        <button class="envelope" id="envelope" type="button" aria-label="Open the birthday card">
+          <div class="env-shadow"></div>
 
-        <div class="env-body">
-          <div class="env-back"></div>
-          <div class="env-front"></div>
-          <div class="env-flap"></div>
+          <div class="env-body">
+            <div class="env-back"></div>
+            <div class="env-front"></div>
+            <div class="env-flap"></div>
+          </div>
+        </button>
+      </div>
 
-          <div class="letter" id="letter" aria-hidden="true">
-            <div class="card" role="dialog" aria-label="Birthday message">
-              <!-- Decorations on card -->
-              <div class="card-decor" aria-hidden="true">
-                <span class="d d1">🧁</span>
-                <span class="d d2">🎂</span>
-                <span class="d d3">✨</span>
-                <span class="d d4">🎉</span>
-                <span class="d d5">🧁</span>
-                <span class="d d6">💝</span>
-              </div>
+      <!-- Card (shows after click) -->
+      <div class="card-wrap" id="cardWrap" aria-hidden="true">
+        <div class="card" role="dialog" aria-label="Birthday message card">
+          <div class="card-bg-decor" aria-hidden="true"></div>
 
-              <div class="card-top">
-                <div class="badge">🎉</div>
-                <div class="title">Happy Birthday!</div>
-              </div>
-
-              <div class="message" id="msg">
-                Wishing you a day full of smiles, surprises, and sweet moments. 💛
-              </div>
-
-              <div class="from" id="from">— Someone who cares</div>
+          <div class="card-header">
+            <div class="header-badge">🎉</div>
+            <div class="header-text">
+              <div class="header-title">Happy Birthday!</div>
+              <div class="header-sub">A little surprise just for you</div>
             </div>
           </div>
+
+          <div class="card-wave" aria-hidden="true">
+            <svg viewBox="0 0 600 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,30 C90,70 160,5 250,35 C340,65 410,20 505,40 C560,52 590,60 600,62 L600,0 L0,0 Z"
+                    fill="rgba(70,150,230,.18)"/>
+              <path d="M0,48 C95,80 170,18 260,46 C350,74 425,30 520,52 C565,62 590,68 600,72 L600,0 L0,0 Z"
+                    fill="rgba(70,150,230,.12)"/>
+            </svg>
+          </div>
+
+          <div class="message" id="msg">
+            Wishing you a day full of smiles, surprises, and sweet moments. 💛
+          </div>
+
+          <div class="from" id="from">— Someone who cares</div>
+
+          <div class="card-footer">
+            <span>🧁</span><span>✨</span><span>🎂</span><span>🎈</span><span>💙</span>
+          </div>
         </div>
-      </button>
+      </div>
 
       <audio id="pop" src="assets/pop.mp3" preload="auto"></audio>
     </section>
